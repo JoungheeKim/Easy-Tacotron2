@@ -1,0 +1,10 @@
+/code/gitRepo/data/personal_wavs/kss/3_2028.wav|제가 입이 짧은 편이어서 많이 안 먹어요.
+/code/gitRepo/data/personal_wavs/kss/3_1019.wav|두고 온 아이들이 자꾸 눈에 밟혀요.
+/code/gitRepo/data/personal_wavs/kss/2_0900.wav|사고 잦은 구간
+/code/gitRepo/data/personal_wavs/kss/4_0881.wav|당신을 대신할 사람은 많아요.
+/code/gitRepo/data/personal_wavs/kss/3_4671.wav|암호가 일치하지 않습니다.
+/code/gitRepo/data/personal_wavs/kss/3_1680.wav|어째서 오늘 학교에 안 간 거니?
+/code/gitRepo/data/personal_wavs/kss/1_0745.wav|이 고개만 넘어가자.
+/code/gitRepo/data/personal_wavs/kss/3_4584.wav|그 사람하고 대화를 한다는 건 여간 힘든 일이 아냐.
+/code/gitRepo/data/personal_wavs/kss/4_5152.wav|공사 때문에 통행에 불편을 드려 죄송합니다.
+/code/gitRepo/data/personal_wavs/kss/3_2268.wav|그는 손자에게 울음을 그치면 케이크를 주겠다고 약속했다.

@@ -1,0 +1,10 @@
+/code/gitRepo/data/kss/3/3_4102.wav|이내 도착할 거야.
+/code/gitRepo/data/kss/4/4_4712.wav|부모님은 시골에 사세요.
+/code/gitRepo/data/kss/4/4_3531.wav|싸움을 말리지 그랬어요?
+/code/gitRepo/data/kss/4/4_3702.wav|이번 비는 모레까지 계속되겠습니다.
+/code/gitRepo/data/kss/4/4_0405.wav|이 보고서 내일 오전까지 끝내야 해요.
+/code/gitRepo/data/kss/4/4_0226.wav|똑같은 실수를 반복하지 마라.
+/code/gitRepo/data/kss/3/3_2558.wav|그는 위생 관념이 부족하다.
+/code/gitRepo/data/kss/3/3_2489.wav|주말 내내 채점해야 할 시험지가 쌓여 있어요.
+/code/gitRepo/data/kss/2/2_1104.wav|내 자신이 정말 한심해 보여요.
+/code/gitRepo/data/kss/4/4_5219.wav|무슨 뜻이야?
