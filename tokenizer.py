@@ -52,7 +52,7 @@ class TacotronTokenizer(object):
     g2p_processor = None
 
     def __init__(self, vocabs={}, normalize_option='NFKD', g2p_lib:str='g2pk'):
-        super(BaseTokenizer, self).__init__()
+        super(TacotronTokenizer, self).__init__()
         self.vocabs_to_ids = vocabs
         
         self.vocabs_to_ids[self.pad_token] = len(self.vocabs_to_ids)
@@ -186,5 +186,5 @@ class TacotronTokenizer(object):
         return len(self.vocabs_to_ids)
 
     def __call__(self, transcript:str, add_special_token:bool=True, **kwargs):
-        return encode(transcript, add_special_token)['text_ids']
+        return self.encode(transcript, add_special_token)['text_ids']
 

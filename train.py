@@ -67,7 +67,7 @@ def prepare_dataloaders(hparams):
                               sampler=train_sampler,
                               batch_size=hparams.batch_size, pin_memory=False,
                               drop_last=True, collate_fn=collate_fn)
-    return train_loader, valset, collate_fn
+    return train_loader, valset, collate_fn, tokenzier
 
 
 def prepare_directories_and_logger(output_directory, log_directory, rank):
@@ -194,7 +194,7 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
     logger = prepare_directories_and_logger(
         output_directory, log_directory, rank)
 
-    train_loader, valset, collate_fn = prepare_dataloaders(hparams)
+    train_loader, valset, collate_fn, tokenizer = prepare_dataloaders(hparams)
 
     # Load checkpoint if one exists
     iteration = 0
@@ -262,6 +262,7 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
                         output_directory, "checkpoint_{}".format(iteration))
                     save_checkpoint(model, optimizer, learning_rate, iteration,
                                     checkpoint_path)
+                    tokenizer.save_pretrained(output_directory)
 
             iteration += 1
 
