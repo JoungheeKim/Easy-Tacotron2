@@ -1,0 +1,3 @@
+
+normalize_option: NFKD
+mask_padding: True

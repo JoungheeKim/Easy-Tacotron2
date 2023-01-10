@@ -15,7 +15,22 @@ from data_utils import TextMelLoader, TextMelCollate
 from loss_function import Tacotron2Loss, NewTacotron2Loss
 from logger import Tacotron2Logger
 from hparams import add_hparams, get_hparams
+import yaml
+from dacite import from_dict
+from configs import Tacotron2Config
 
+
+def load_config(config_path:str):
+    """
+        yaml 파일 읽기
+    """
+    data_path = os.path.abspath(config_path)
+    assert os.path.exists(config_path), "not valid path [{}].".format(config_path)
+    
+    ## load config data
+    with open(config_path, 'r', encoding = "utf-8") as read_f:
+        yaml_data = yaml.safe_load(read_f)    
+        return yaml_data
 
 def reduce_tensor(tensor, n_gpus):
     rt = tensor.clone()
@@ -49,11 +64,11 @@ def prepare_dataloaders(hparams):
     # Get data, data loaders and collate function ready
     trainset = TextMelLoader(hparams.training_files, hparams)
     transcripts = [item[1] for item in trainset.audiopaths_and_text]
-    tokenzier = build_tokenizer(transcripts)
-    trainset.tokenizer = tokenzier
+    tokenizer = build_tokenizer(transcripts)
+    trainset.tokenizer = tokenizer
 
     valset = TextMelLoader(hparams.validation_files, hparams)
-    valset.tokenizer = tokenzier
+    valset.tokenizer = tokenizer
     collate_fn = TextMelCollate(hparams.n_frames_per_step)
 
     if hparams.distributed_run:
@@ -67,7 +82,7 @@ def prepare_dataloaders(hparams):
                               sampler=train_sampler,
                               batch_size=hparams.batch_size, pin_memory=False,
                               drop_last=True, collate_fn=collate_fn)
-    return train_loader, valset, collate_fn, tokenzier
+    return train_loader, valset, collate_fn, tokenizer
 
 
 def prepare_directories_and_logger(output_directory, log_directory, rank):
@@ -81,8 +96,8 @@ def prepare_directories_and_logger(output_directory, log_directory, rank):
     return logger
 
 
-def load_model(hparams, device=torch.device('cuda')):
-    model = Tacotron2(hparams).to(device)
+def load_model(cfg, hparams, device=torch.device('cuda')):
+    model = Tacotron2(cfg).to(device)
     if hparams.fp16_run:
         model.decoder.attention_layer.score_mask_value = finfo('float16').min
 
@@ -154,7 +169,7 @@ def validate(model, criterion, valset, iteration, batch_size, n_gpus,
     model.train()
     if rank == 0:
         print("Validation loss {}: {:9f}  ".format(iteration, val_loss))
-        logger.log_validation(val_loss, model, y, y_pred, iteration)
+        #logger.log_validation(val_loss, model, y, y_pred, iteration)
 
 
 def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
@@ -176,7 +191,17 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
     torch.manual_seed(hparams.seed)
     torch.cuda.manual_seed(hparams.seed)
 
-    model = load_model(hparams)
+    logger = prepare_directories_and_logger(
+        output_directory, log_directory, rank)
+
+    train_loader, valset, collate_fn, tokenizer = prepare_dataloaders(hparams)
+
+    target_path = 'config/train_kss.yaml'
+    config_dict = load_config(target_path)
+    cfg = from_dict(data_class=Tacotron2Config, data=config_dict)
+    cfg.num_labels = tokenizer.get_num_labels()
+
+    model = load_model(cfg, hparams)
     learning_rate = hparams.learning_rate
     optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate,
                                  weight_decay=hparams.weight_decay)
@@ -193,11 +218,6 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
         criterion = NewTacotron2Loss()
     else:
         criterion = Tacotron2Loss()
-
-    logger = prepare_directories_and_logger(
-        output_directory, log_directory, rank)
-
-    train_loader, valset, collate_fn, tokenizer = prepare_dataloaders(hparams)
 
     # Load checkpoint if one exists
     iteration = 0
@@ -263,8 +283,7 @@ def train(output_directory, log_directory, checkpoint_path, warm_start, n_gpus,
                 if rank == 0:
                     checkpoint_path = os.path.join(
                         output_directory, "checkpoint_{}".format(iteration))
-                    save_checkpoint(model, optimizer, learning_rate, iteration,
-                                    checkpoint_path)
+                    model.save_pretrained(checkpoint_path)
                     tokenizer.save_pretrained(output_directory)
 
             iteration += 1

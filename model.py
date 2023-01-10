@@ -5,6 +5,7 @@ from torch import nn
 from torch.nn import functional as F
 from layers import ConvNorm, LinearNorm
 from utils import to_gpu, get_mask_from_lengths
+import os
 
 
 class LocationLayer(nn.Module):
@@ -455,8 +456,19 @@ class Decoder(nn.Module):
 
 
 class Tacotron2(nn.Module):
+    """
+        Tacotron2 module:
+            - Encoder
+            - Decoder
+            - Postnet
+    """
+
+    model_save_name = 'pretrained_model.bin'
+
+
     def __init__(self, hparams):
         super(Tacotron2, self).__init__()
+        self.hparams = hparams
         self.mask_padding = hparams.mask_padding
         self.fp16_run = hparams.fp16_run
         self.n_mel_channels = hparams.n_mel_channels
@@ -527,3 +539,27 @@ class Tacotron2(nn.Module):
             [mel_outputs, mel_outputs_postnet, gate_outputs, alignments])
 
         return outputs
+
+    @classmethod
+    def from_pretrained(cls, pretrained_path):
+        pretrained_path = get_abspath(pretrained_path)
+        print('load files from [{}]'.format(pretrained_path))
+        state = torch.load(os.path.join(pretrained_path, cls.model_save_name), map_location=torch.device('cpu'))
+        hparams = state['hparams']
+        model = cls(hparams)
+        model.load_state_dict(state['model'])
+
+        return model
+
+    def save_pretrained(self, save_path):
+        save_path = get_abspath(save_path)
+        os.makedirs(save_path, exist_ok=True)
+        state = {
+            'hparams' : self.hparams,
+            'model' : self.state_dict(),
+        }
+        torch.save(state, os.path.join(save_path, self.model_save_name))
+        print('save files to [{}]'.format(save_path))
+
+def get_abspath(temp_path):
+    return os.path.abspath(temp_path)
