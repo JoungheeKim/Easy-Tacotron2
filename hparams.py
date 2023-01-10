@@ -9,6 +9,7 @@ defaults = {
     'iters_per_checkpoint':10000,
     'seed':1234,
     'dynamic_loss_scaling':True,
+    'new_loss_function':False,
     'fp16_run':False,
     'distributed_run':False,
     'dist_backend':"nccl",

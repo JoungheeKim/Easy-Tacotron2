@@ -482,7 +482,7 @@ class Tacotron2(nn.Module):
 
         return (
             (text_padded, input_lengths, mel_padded, max_len, output_lengths),
-            (mel_padded, gate_padded))
+            (mel_padded, gate_padded, output_lengths))
 
     def parse_output(self, outputs, output_lengths=None):
         if self.mask_padding and output_lengths is not None:
